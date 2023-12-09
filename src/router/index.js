@@ -4,11 +4,17 @@ import Layout from '@/views/layout/Index'
 import Home from '@/views/home/Index'
 import About from '@/views/about/Index'
 import ErrorPage from '@/views/error-page/Index'
-
+import Login from '@/views/login/Index'
 Vue.use(VueRouter)
 
 const routes = [
-
+  // login路由
+  {
+    path:'/login',
+    name: 'login',
+    component: Login
+  },
+  // main路由
   {
     path: '/',
     name: '',
