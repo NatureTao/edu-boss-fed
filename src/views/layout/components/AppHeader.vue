@@ -12,11 +12,11 @@
         <!-- 下拉菜单 -->
         <el-dropdown>
             <span class="el-dropdown-link">
-                <el-avatar :size="32" src="https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png"></el-avatar>
+                <el-avatar :size="32" :src="userInfo.portrait"></el-avatar>
                 <i class="el-icon-arrow-down el-icon--right"></i>
             </span>
             <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item>用户信息</el-dropdown-item>
+              <el-dropdown-item>{{userInfo.userName}}</el-dropdown-item>
               <el-dropdown-item divided>注销</el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
@@ -25,8 +25,14 @@
 </template>
 
 <script>
+    import { getUserInfo } from '@/api/user'
     export default {
         name: 'AppHeader',
+        data(){
+            return {
+                userInfo: {}
+            }
+        },
         props: {
             isCollapse: {
                 type: Boolean,
@@ -43,6 +49,9 @@
             iconClassName() {
                 return this.isCollapse ? 'el-icon-s-unfold' : 'el-icon-s-fold'
             }
+        },
+        created(){
+            getUserInfo().then(res => this.userInfo = res.data.content)
         }
     }
 </script>

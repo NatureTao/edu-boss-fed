@@ -16,7 +16,8 @@
                         <el-input type="password" class="inputItem" v-model="formData.password"
                             placeholder="密码"></el-input>
                     </el-form-item>
-                    <button class="btn" @click="onSubmit">登录</button>
+
+                    <el-button class="btn" @click="onSubmit" :loading="isLoading">登录</el-button>
 
 
 
@@ -29,7 +30,7 @@
 </template>
 
 <script>
-    import request from '@/utils/request'
+    import { login } from '@/api/user'
     export default {
         name: 'LoginIndex',
         data() {
@@ -47,27 +48,44 @@
                         { required: true, message: '你确定这里有东西吗?', trigger: 'blur' },
                         { min: 3, max: 16, message: '密码长度为3~16位', trigger: 'blur' }
                     ]
-                }
+                },
+                // 是否已经发送请求
+                isLoading: false
             }
         },
         methods: {
             onSubmit() {
-                this.$refs.loginForm.validate()
-                    .then(() => {
-                        // 表达数据验证通过->发送请求
-                        // this.$message.success(' 验证通过 发送请求')
-                        request({
-                            method: 'POST',
-                            url: '/front/user/login',
-                            data: `phone=${this.formData.phone}&password=${this.formData.password}`
-                        }).then((res) => {
-                            console.log(res)
-                        })
+                //控制请求发送次数
+                this.isLoading = true
+                this.$refs.loginForm
+                    .validate()
+                    // 表达数据验证通过->发送请求
+                    .then(() => login(this.formData))
+                    .then((res) => {
+                        const { data } = res
+                        if (data.success) {
+                            //成功
+                            this.$message.success('登录成功')
+                            //保存登录token
+                            this.$store.commit('saveTokenInfo',data.content)
+                            this.$router.push(this.$route.query.redirect || '/')
+                            
+                            // console.log(data.content)
+                        } else {
+                            //失败
+    
+                            this.$message.error('用户名或密码错误')
+                        }
+                        // console.log(res)
                     })
                     .catch(() => {
                         // 表达数据验证失败 Error处理
                         this.$message.error('验证失败')
+                       
 
+                    }).finally( ()=>{
+                        //还原按钮可用状态
+                        this.isLoading = false
                     })
             }
         }
@@ -83,7 +101,7 @@
 
     /* 修改输入框默认样式 */
     ::v-deep .el-form-item__content {
-        
+
         margin-left: 0 !important;
 
     }
@@ -97,7 +115,7 @@
         width: 60%;
         height: 450px;
         box-shadow: 0 5px 15px rgba(0, 0, 0, 0.8);
-        
+
         display: flex;
         position: fixed;
         top: 50%;
@@ -155,7 +173,9 @@
             display: block;
             margin: auto;
             margin-top: 30px;
+
         }
+
 
     }
 
