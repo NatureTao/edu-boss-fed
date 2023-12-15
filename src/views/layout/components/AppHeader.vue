@@ -17,7 +17,7 @@
             </span>
             <el-dropdown-menu slot="dropdown">
               <el-dropdown-item>{{userInfo.userName}}</el-dropdown-item>
-              <el-dropdown-item divided>注销</el-dropdown-item>
+              <el-dropdown-item divided @click.native="handleLogout">注销</el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
 
@@ -25,7 +25,9 @@
 </template>
 
 <script>
-    import { getUserInfo } from '@/api/user'
+    
+    import { getUserInfo,logout } from '@/api/user'
+
     export default {
         name: 'AppHeader',
         data(){
@@ -44,6 +46,27 @@
 
             }
 
+        },
+        methods:{
+            handleLogout(){
+                this.$confirm('确定要注销吗?','注销提示信息',{
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() =>{
+                    //服务器发送注销请求
+                    logout()
+                })
+                .then( () => {
+                    //清空本地登录信息
+                    this.$store.commit('saveTokenInfo',null)
+                    this.$message.success('注销成功!')
+                    this.$router.push('/login')
+                }).catch( ()=>{
+
+                })
+
+            }
         },
         computed: {
             iconClassName() {
